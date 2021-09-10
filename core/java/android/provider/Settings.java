@@ -7487,6 +7487,18 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_WEATHER_CLICK_UPDATES = "lockscreen_weather_click_updates";
+        
+        /**
+         * Whether to show daily/weekly data usage in the QS footer.
+         * @hide
+         */
+        public static final String QS_SHOW_DATA_USAGE = "qs_show_data_usage";
+
+        /**
+         * Persist setting for showing either daily or weekly data usage in the QS footer.
+         * @hide
+         */
+        public static final String QS_SHOW_DATA_USAGE_WINDOW = "qs_show_data_usage_window";
 
         /**
          * Force full screen for devices with cutout
