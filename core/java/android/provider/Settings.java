@@ -7227,6 +7227,20 @@ public final class Settings {
          */
         @Readable
         public static final String VIBRATE_ON_DISCONNECT = "vibrate_on_disconnect";
+        
+        /**
+         * GameSpace: List of added games by user
+         * @hide
+         */
+        @Readable
+        public static final String GAMESPACE_GAME_LIST = "gamespace_game_list";
+
+        /**
+         * GameSpace: Whether fullscreen intent will be suppressed while in game session
+         * @hide
+         */
+        @Readable
+        public static final String GAMESPACE_SUPPRESS_FULLSCREEN_INTENT = "gamespace_suppress_fullscreen_intent";
 
         /**
          * Whether the torch launch gesture to double tap or long press the power button when the
@@ -24705,3 +24719,4 @@ public final class Settings {
         return packages[0];
     }
 }
+

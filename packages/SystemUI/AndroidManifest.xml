@@ -340,6 +340,9 @@
 
     <!-- Query advanced protection state -->
     <uses-permission android:name="android.permission.QUERY_ADVANCED_PROTECTION_MODE" />
+    
+    <!-- To broadcast status of the GameSpaceManager -->
+    <uses-permission android:name="android.permission.MANAGE_GAME_MODE" />
 
     <queries>
         <intent>
@@ -1377,3 +1380,4 @@
 
     </application>
 </manifest>
+
