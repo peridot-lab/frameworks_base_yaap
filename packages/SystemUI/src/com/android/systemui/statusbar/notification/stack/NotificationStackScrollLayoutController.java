@@ -238,6 +238,7 @@ public class NotificationStackScrollLayoutController implements Dumpable {
                     mColorUpdateLogger.logTriggerEvent("NSSLC.onViewDetachedFromWindow()");
                     mConfigurationController.removeCallback(mConfigurationListener);
                     mStatusBarStateController.removeCallback(mStateListener);
+                    mTunerService.removeTunable(mTunable);
                 }
             };
 
@@ -996,16 +997,7 @@ public class NotificationStackScrollLayoutController implements Dumpable {
         mVisibilityLocationProviderDelegator.setDelegate(this::isInVisibleLocation);
 
         mTunerService.addTunable(
-                (key, newValue) -> {
-                    switch (key) {
-                        case Settings.Secure.NOTIFICATION_HISTORY_ENABLED:
-                            mHistoryEnabled = null;  // invalidate
-                            break;
-                        case HIGH_PRIORITY:
-                            mView.setHighPriorityBeforeSpeedBump("1".equals(newValue));
-                            break;
-                    }
-                },
+                mTunable,
                 HIGH_PRIORITY,
                 Settings.Secure.NOTIFICATION_HISTORY_ENABLED);
 
@@ -1040,6 +1032,17 @@ public class NotificationStackScrollLayoutController implements Dumpable {
     public void setApplyHunTranslation(boolean apply) {
         mView.setApplyHunTranslation(apply);
     }
+
+    private TunerService.Tunable mTunable = (key, newValue) -> {
+        switch (key) {
+            case Settings.Secure.NOTIFICATION_HISTORY_ENABLED:
+                mHistoryEnabled = null;  // Invalidate
+                break;
+            case HIGH_PRIORITY:
+                mView.setHighPriorityBeforeSpeedBump("1".equals(newValue));
+                break;
+        }
+    };
 
     private boolean isInVisibleLocation(NotificationEntry entry) {
         ExpandableNotificationRow row = entry.getRow();
