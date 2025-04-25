@@ -135,6 +135,9 @@
 
     <!-- Whether to force enable multi resolution configuration for camera -->
     <java-symbol type="bool" name="config_forceMultiResolution" />
+   
+    <!-- GameSpace -->
+    <java-symbol type="string" name="gamespace_new_game_added" />
 
     <!-- Whether to cleanup fingerprints upon connection to the daemon and when
          user switches -->

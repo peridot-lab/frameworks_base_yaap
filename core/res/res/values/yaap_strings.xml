@@ -89,6 +89,9 @@
     <string name="battery_saver_on_notification_title">Battery Saver turned on</string>
     <string name="battery_saver_on_notification_summary">By schedule. Press to review settings.</string>
 
+    <!-- GameSpace -->
+    <string name="gamespace_new_game_added"><xliff:g id="name" example="MyApp">%s</xliff:g> added to GameSpace</string>
+
     <!-- PowerOffAlarmService -->
     <string name="notification_channel_poweroff_alarm">Power off alarm</string>
     <string name="poweroff_alarm_title">Power off alarm set</string>
