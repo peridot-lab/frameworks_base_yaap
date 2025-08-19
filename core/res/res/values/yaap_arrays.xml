@@ -24,5 +24,9 @@
         <item>reboot_sysui</item>
     </string-array>
 
+    <!-- Blur radius used by SystemUI -->
+    <dimen name="min_window_blur_radius">1px</dimen>
+    <dimen name="max_window_blur_radius">17.5px</dimen>
+
     <string-array translatable="false" name="config_loggersPkgList" />
 </resources>
