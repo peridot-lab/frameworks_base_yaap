@@ -291,6 +291,12 @@ class ProcessRecord extends ProcessRecordInternal implements WindowProcessListen
     private ActiveInstrumentation mInstr;
 
     /**
+     * True when proc has been triggered by lmkd, due to RAM.
+     * not indicate that the killing has been completed
+     */
+    private boolean mKilledByLmk;
+
+    /**
      * The timestamp in uptime when this process was killed.
      */
     @CompositeRWLock({"mService", "mProcLock"})
@@ -1056,6 +1062,15 @@ class ProcessRecord extends ProcessRecordInternal implements WindowProcessListen
     }
 
     @GuardedBy(anyOf = {"mService", "mProcLock"})
+
+    boolean isKilledByLmk() {
+        return mKilledByLmk;
+    }
+
+    void setKilledByLmk(boolean killedByLmk) {
+        mKilledByLmk = killedByLmk;
+    }
+
     long getKillTime() {
         return mKillTime;
     }
