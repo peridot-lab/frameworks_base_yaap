@@ -339,22 +339,21 @@ constructor(
 
     var shouldUpdateSquishinessOnMedia by mutableStateOf(false)
 
-    val qsMediaTranslationY by derivedStateOf {
-        if (
+    val qsMediaTranslationY: Float
+        get() = if (
             !MediaControlsInComposeFlag.isEnabled &&
-                !Flags.mediaControlsTranslationFix() &&
-                qsExpansion > 0f &&
-                !isKeyguardState &&
-                !qqsMediaVisible &&
-                !qsMediaInRow &&
-                !isInSplitShade
+            !Flags.mediaControlsTranslationFix() &&
+            qsExpansion > 0f &&
+            !isKeyguardState &&
+            !qqsMediaVisible &&
+            !qsMediaInRow &&
+            !isInSplitShade
         ) {
             val interpolation = Interpolators.ACCELERATE.getInterpolation(1f - qsExpansion)
             -qsMediaHost.hostView.height * 1.3f * interpolation
         } else {
             0f
         }
-    }
 
     val animateTilesExpansion: Boolean
         get() = inFirstPage && !mediaSuddenlyAppearingInLandscape
