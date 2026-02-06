@@ -909,12 +909,6 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
             mActivityManager.setThemeOverlayReady(currentUser);
         };
 
-        if (!forceReload && colorSchemeIsApplied(managedProfiles)) {
-            Log.d(TAG, "Skipping overlay creation. Theme was already: " + mColorScheme);
-            onCompleteCallback.run();
-            return;
-        }
-
         if (DEBUG) {
             Log.d(TAG, "Applying overlays: " + categoryToPackage.keySet().stream()
                     .map(key -> key + " -> " + categoryToPackage.get(key)).collect(
