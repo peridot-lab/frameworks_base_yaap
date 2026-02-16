@@ -26,16 +26,45 @@ import com.android.internal.R;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public final class PixelPropsUtils {
     private static final String PACKAGE_FINSKY = "com.android.vending";
     private static final String PACKAGE_GMS = "com.google.android.gms";
+    private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String VERSION_PREFIX = "VERSION.";
+    private static final String FEATURE_NEXUS_PRELOAD = "com.google.android.apps.photos.NEXUS_PRELOAD";
+
+    private static final Set<String> sPixelFeatures = Set.of(
+        "PIXEL_2017_EXPERIENCE",
+        "PIXEL_2017_PRELOAD",
+        "PIXEL_2018_EXPERIENCE",
+        "PIXEL_2018_PRELOAD",
+        "PIXEL_2019_EXPERIENCE",
+        "PIXEL_2019_MIDYEAR_EXPERIENCE",
+        "PIXEL_2019_MIDYEAR_PRELOAD",
+        "PIXEL_2019_PRELOAD",
+        "PIXEL_2020_EXPERIENCE",
+        "PIXEL_2020_MIDYEAR_EXPERIENCE",
+        "PIXEL_2021_MIDYEAR_EXPERIENCE"
+    );
+
+    private static final Set<String> sTensorFeatures = Set.of(
+        "PIXEL_2021_EXPERIENCE",
+        "PIXEL_2022_EXPERIENCE",
+        "PIXEL_2022_MIDYEAR_EXPERIENCE",
+        "PIXEL_2023_EXPERIENCE",
+        "PIXEL_2023_MIDYEAR_EXPERIENCE",
+        "PIXEL_2024_EXPERIENCE",
+        "PIXEL_2024_MIDYEAR_EXPERIENCE"
+    );
 
     private final HashMap<String, Object> certifiedProps;
+    private final HashMap<String, Object> pixelXLProps;
 
     private static final ArrayList<String> finskyProps = new ArrayList<>();
     static {
@@ -45,6 +74,7 @@ public final class PixelPropsUtils {
     }
 
     private static volatile boolean sIsEnabled = false;
+    private static volatile boolean sIsPhotos = false;
 
     private static PixelPropsUtils sInstance = null;
 
@@ -107,6 +137,16 @@ public final class PixelPropsUtils {
         if (!Build.TAGS.equals("release-keys"))
             tMap.put("TAGS", "release-keys");
         certifiedProps = new HashMap<>(tMap);
+
+        // init Original Pixel XL props for Google Photos
+        Map<String, Object> xlMap = new HashMap<>();
+        xlMap.put("BRAND", "google");
+        xlMap.put("MANUFACTURER", "Google");
+        xlMap.put("DEVICE", "marlin");
+        xlMap.put("PRODUCT", "marlin");
+        xlMap.put("MODEL", "Pixel XL");
+        xlMap.put("FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys");
+        pixelXLProps = new HashMap<>(xlMap);
     }
 
     public void setProps(String packageName) {
@@ -122,6 +162,14 @@ public final class PixelPropsUtils {
             return;
         }
         Logger.d("Package = " + packageName);
+        
+        // Google Photos spoofing
+        if (PACKAGE_GPHOTOS.equals(packageName)) {
+            sIsPhotos = true;
+            pixelXLProps.forEach(PixelPropsUtils::setPropValue);
+            return;
+        }
+        
         final boolean isFinsky = PACKAGE_FINSKY.equals(packageName);
         if (!isFinsky && (!PACKAGE_GMS.equals(packageName) ||
                 !PROCESS_GMS_UNSTABLE.equals(Application.getProcessName()))) {
@@ -153,6 +201,20 @@ public final class PixelPropsUtils {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             Logger.e("Failed to set prop " + key, e);
         }
+    }
+
+    public static boolean hasSystemFeature(String name, boolean has) {
+        if (sIsPhotos) {
+            if (has && (sPixelFeatures.stream().anyMatch(name::contains)
+                    || sTensorFeatures.stream().anyMatch(name::contains))) {
+                Logger.d("Blocked system feature " + name + " for Google Photos");
+                has = false;
+            } else if (!has && name.equalsIgnoreCase(FEATURE_NEXUS_PRELOAD)) {
+                Logger.d("Enabled system feature " + name + " for Google Photos");
+                has = true;
+            }
+        }
+        return has;
     }
 
     public static boolean getIsEnabled() {
