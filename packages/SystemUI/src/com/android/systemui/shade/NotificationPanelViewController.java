@@ -2131,6 +2131,7 @@ public final class NotificationPanelViewController implements
     }
 
     private void onTrackingStarted() {
+        boostInteraction(700);
         endClosing();
         mShadeRepository.setLegacyShadeTracking(true);
         if (mTrackingStartedListener != null) {
@@ -2845,6 +2846,7 @@ public final class NotificationPanelViewController implements
             mIsExpandingOrCollapsing = true;
             mQsController.onExpandingStarted(mQsController.getFullyExpanded());
         }
+        boostInteraction(700);
     }
 
     void notifyExpandingFinished() {
