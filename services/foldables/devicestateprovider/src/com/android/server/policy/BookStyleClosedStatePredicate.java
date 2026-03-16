@@ -235,6 +235,8 @@ public class BookStyleClosedStatePredicate implements Predicate<FoldableDeviceSt
 
         private boolean mScreenTurnedOn = false;
         private boolean mDeviceClosed = false;
+        private boolean mLastTentOrWedge = false;
+        private boolean mLastLeftFlat = false;
 
         public PostureEstimator(Handler handler, SensorManager sensorManager,
                 @Nullable Sensor leftAccelerometerSensor,
@@ -293,7 +295,14 @@ public class BookStyleClosedStatePredicate implements Predicate<FoldableDeviceSt
                 mLastDeviceOrientationSensorEvent = event;
             }
 
-            mOnEstimationChanged.run();
+            boolean tentOrWedge = isLikelyTentOrWedgeMode();
+            boolean leftFlat = Objects.equals(
+                    isGravityVectorMostlyFlat(mLeftGravityVector), Boolean.TRUE);
+            if (tentOrWedge != mLastTentOrWedge || leftFlat != mLastLeftFlat) {
+                mLastTentOrWedge = tentOrWedge;
+                mLastLeftFlat = leftFlat;
+                mOnEstimationChanged.run();
+            }
         }
 
         @Override
