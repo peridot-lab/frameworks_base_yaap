@@ -57,6 +57,10 @@
     <java-symbol name="reboot_system_message" type="string" />
     <java-symbol type="array" name="config_rebootActionsList" />
 
+    <!-- App lock -->
+    <java-symbol type="string" name="unlock_application" />
+    <java-symbol type="array" name="config_appLockAllowedSystemApps" />
+
     <!-- Pocket Lock -->
     <java-symbol type="layout" name="pocket_lock_view" />
     <java-symbol type="bool" name="config_pocketModeSupported" />
