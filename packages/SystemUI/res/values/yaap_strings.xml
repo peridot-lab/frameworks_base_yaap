@@ -126,6 +126,12 @@
     <string name="weather_condition_wind">Windy</string>
     <string name="weather_condition_mist">Misty</string>
 
+    <!-- Sound QS Tile -->
+    <string name="quick_settings_sound_label">Sound</string>
+    <string name="quick_settings_sound_ring">Ring</string>
+    <string name="quick_settings_sound_vibrate">Vibrate</string>
+    <string name="quick_settings_sound_mute">Mute</string>
+
     <!-- QS footer text dialog -->
     <string name="qs_footer_dialog_title">QS Footer Text</string>
     <string name="qs_footer_dialog_toast">Long press to change text</string>
