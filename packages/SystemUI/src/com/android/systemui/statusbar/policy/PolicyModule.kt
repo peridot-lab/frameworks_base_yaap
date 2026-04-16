@@ -30,6 +30,7 @@ import com.android.systemui.qs.shared.model.TileCategory
 import com.android.systemui.qs.tileimpl.QSTileImpl
 import com.android.systemui.qs.tiles.AlarmTile
 import com.android.systemui.qs.tiles.AODTile
+import com.android.systemui.qs.tiles.SoundTile
 import com.android.systemui.qs.tiles.CaffeineTile
 import com.android.systemui.qs.tiles.CameraToggleTile
 import com.android.systemui.qs.tiles.DcDimTile
@@ -140,6 +141,7 @@ interface PolicyModule {
         const val LOCATION_TILE_SPEC = "location"
         const val ALARM_TILE_SPEC = "alarm"
         const val UIMODENIGHT_TILE_SPEC = "dark"
+        const val SOUND_TILE_SPEC = "sound"
         const val WORK_MODE_TILE_SPEC = "work"
         const val CAMERA_TOGGLE_TILE_SPEC = "cameratoggle"
         const val MIC_TOGGLE_TILE_SPEC = "mictoggle"
@@ -596,6 +598,21 @@ interface PolicyModule {
                 instanceId = uiEventLogger.getNewInstanceId(),
                 category = TileCategory.DISPLAY,
             )
+
+        @Provides
+        @IntoMap
+        @StringKey(SOUND_TILE_SPEC)
+        fun provideSoundConfig(uiEventLogger: QsEventLogger): QSTileConfig =
+            QSTileConfig(
+                tileSpec = TileSpec.create(SOUND_TILE_SPEC),
+                uiConfig =
+                    QSTileUIConfig.Resource(
+                        iconRes = R.drawable.ic_qs_ringer_audible,
+                        labelRes = R.string.quick_settings_sound_label
+                    ),
+                instanceId = uiEventLogger.getNewInstanceId(),
+                category = TileCategory.UTILITIES,
+            )
     }
 
     /** Inject LocationTile into tileMap in QSModule */
@@ -661,4 +678,10 @@ interface PolicyModule {
     @IntoMap
     @StringKey(DcDimTile.TILE_SPEC)
     fun bindDcDimTile(dcDimTile: DcDimTile): QSTileImpl<*>
+
+    /** Inject SoundTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(SoundTile.TILE_SPEC)
+    fun bindSoundTile(soundTile: SoundTile): QSTileImpl<*>
 }
