@@ -22,6 +22,7 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.UserHandle;
 import android.service.quicksettings.Tile;
 
 import androidx.annotation.Nullable;
@@ -52,8 +53,8 @@ public class SoundTile extends QSTileImpl<BooleanState> {
 
     private boolean mListening = false;
 
+    private final BroadcastDispatcher mBroadcastDispatcher;
     private BroadcastReceiver mReceiver;
-    private IntentFilter mFilter;
 
     @Inject
     public SoundTile(
@@ -71,6 +72,7 @@ public class SoundTile extends QSTileImpl<BooleanState> {
         super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
                 statusBarStateController, activityStarter, qsLogger);
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        mBroadcastDispatcher = broadcastDispatcher;
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -94,9 +96,9 @@ public class SoundTile extends QSTileImpl<BooleanState> {
         if (listening) {
             final IntentFilter filter = new IntentFilter();
             filter.addAction(AudioManager.INTERNAL_RINGER_MODE_CHANGED_ACTION);
-            mContext.registerReceiver(mReceiver, filter);
+            mBroadcastDispatcher.registerReceiver(mReceiver, filter, null, UserHandle.ALL);
         } else {
-            mContext.unregisterReceiver(mReceiver);
+            mBroadcastDispatcher.unregisterReceiver(mReceiver);
         }
     }
 
