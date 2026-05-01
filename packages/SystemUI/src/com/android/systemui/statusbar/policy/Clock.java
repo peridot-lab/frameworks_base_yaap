@@ -410,6 +410,7 @@ public class Clock extends TextView implements
                 reloadDimens();
             }
         }
+        setTextAppearance(com.android.systemui.res.R.style.TextAppearance_StatusBar_Default);
     }
 
     private void updateShowSeconds() {
