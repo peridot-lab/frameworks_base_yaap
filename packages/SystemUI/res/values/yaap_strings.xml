@@ -144,6 +144,9 @@
     <!-- QS DC Dim -->
     <string name="quick_settings_dc_dim">DC Dimming</string>
 
+    <!-- Wifi Standard. -->
+    <string name="status_bar_wifi_standard">Wifi Standard</string>
+
     <!-- Flashlight Strength -->
     <string name="flashlight_strength_title">Flashlight Strength</string>
     <string name="flashlight_strength_turn_off">Turn off</string>
