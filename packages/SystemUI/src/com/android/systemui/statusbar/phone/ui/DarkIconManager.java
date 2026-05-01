@@ -29,6 +29,7 @@ import com.android.systemui.statusbar.phone.DemoStatusIcons;
 import com.android.systemui.statusbar.phone.StatusBarIconHolder;
 import com.android.systemui.statusbar.phone.StatusBarLocation;
 import com.android.systemui.statusbar.pipeline.mobile.ui.MobileUiAdapter;
+import com.android.systemui.statusbar.WifiStandardViewController;
 import com.android.systemui.statusbar.pipeline.mobile.ui.MobileUiAdapterKairos;
 import com.android.systemui.statusbar.pipeline.wifi.ui.WifiUiAdapter;
 
@@ -56,6 +57,7 @@ public class DarkIconManager extends IconManager {
             MobileContextProvider mobileContextProvider,
             KairosNetwork kairosNetwork,
             @Application CoroutineScope appScope,
+            WifiStandardViewController.Factory wifiStandardFactory,
             @Assisted DarkIconDispatcher darkIconDispatcher) {
         super(linearLayout,
                 location,
@@ -64,7 +66,8 @@ public class DarkIconManager extends IconManager {
                 mobileUiAdapterKairos,
                 mobileContextProvider,
                 kairosNetwork,
-                appScope);
+                appScope,
+                wifiStandardFactory);
         mIconHorizontalMargin = mContext.getResources().getDimensionPixelSize(
                 com.android.systemui.res.R.dimen.status_bar_icon_horizontal_margin);
         mDarkIconDispatcher = darkIconDispatcher;
