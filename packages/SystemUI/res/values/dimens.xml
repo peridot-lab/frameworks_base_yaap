@@ -2297,4 +2297,6 @@
     <dimen name="tile_details_entry_start_margin">16dp</dimen>
     <!-- Tile Details end -->
 
+    <dimen name="wifi_standard_spacer_width">1sp</dimen>
+
 </resources>
