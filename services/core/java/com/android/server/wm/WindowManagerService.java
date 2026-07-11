@@ -114,6 +114,7 @@ import static android.view.displayhash.DisplayHashResultCallback.DISPLAY_HASH_ER
 import static android.view.flags.Flags.sensitiveContentAppProtection;
 import static android.window.ScreenCapture.ScreenCaptureParams.CAPTURE_MODE_REQUIRE_OPTIMIZED;
 import static android.window.ScreenCapture.ScreenCaptureParams.PROTECTED_CONTENT_POLICY_THROW_EXCEPTION;
+import static android.window.ScreenCapture.ScreenCaptureParams.SECURE_CONTENT_POLICY_CAPTURE;
 import static android.window.ScreenCapture.ScreenCaptureParams.SECURE_CONTENT_POLICY_THROW_EXCEPTION;
 import static android.window.WindowProviderService.isWindowProviderService;
 
@@ -847,6 +848,8 @@ public class WindowManagerService extends IWindowManager.Stub
                 Settings.Secure.getUriFor(Settings.Secure.IMMERSIVE_MODE_CONFIRMATIONS);
         private final Uri mDisableSecureWindowsUri =
                 Settings.Secure.getUriFor(Settings.Secure.DISABLE_SECURE_WINDOWS);
+        private final Uri mWindowIgnoreSecureUri =
+                Settings.Global.getUriFor(Settings.Global.WINDOW_IGNORE_SECURE);
         private final Uri mMagnifyImeEnabledUri = Settings.Secure.getUriFor(
                 Settings.Secure.ACCESSIBILITY_MAGNIFICATION_MAGNIFY_NAV_AND_IME);
         private final Uri mPolicyControlUri =
@@ -886,6 +889,8 @@ public class WindowManagerService extends IWindowManager.Stub
             resolver.registerContentObserver(mImmersiveModeConfirmationsUri, false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(mDisableSecureWindowsUri, false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(mWindowIgnoreSecureUri, false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(mMagnifyImeEnabledUri, false, this,
                     UserHandle.USER_ALL);
@@ -947,6 +952,11 @@ public class WindowManagerService extends IWindowManager.Stub
 
             if (mDisableSecureWindowsUri.equals(uri)) {
                 updateDisableSecureWindows();
+                return;
+            }
+
+            if (mWindowIgnoreSecureUri.equals(uri)) {
+                updateWindowIgnoreSecure();
                 return;
             }
 
@@ -1084,6 +1094,12 @@ public class WindowManagerService extends IWindowManager.Stub
 
             synchronized (mGlobalLock) {
                 mDisableSecureWindows = disableSecureWindows;
+                mRoot.refreshSecureSurfaceState();
+            }
+        }
+
+        void updateWindowIgnoreSecure() {
+            synchronized (mGlobalLock) {
                 mRoot.refreshSecureSurfaceState();
             }
         }
@@ -11138,10 +11154,16 @@ public class WindowManagerService extends IWindowManager.Stub
             }
         }
 
-        return new ScreenCaptureInternal.LayerCaptureArgs.Builder(
+        final ScreenCaptureInternal.LayerCaptureArgs.Builder builder =
+                new ScreenCaptureInternal.LayerCaptureArgs.Builder(
                         displaySurfaceControl, captureArgs)
-                .setSourceCrop(mTmpRect)
-                .build();
+                        .setSourceCrop(mTmpRect);
+
+        if (getDisableSecureWindows()) {
+            builder.setSecureContentPolicy(SECURE_CONTENT_POLICY_CAPTURE);
+        }
+
+        return builder.build();
     }
 
     @Override
