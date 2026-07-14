@@ -39,6 +39,16 @@ public final class PixelPropsUtils {
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String VERSION_PREFIX = "VERSION.";
+    private static final String PACKAGE_PHOTOS = "com.google.android.apps.photos";
+
+    private static final Map<String, Object> marlinProps = Map.of(
+        "BRAND", "google",
+        "MANUFACTURER", "Google",
+        "DEVICE", "marlin",
+        "PRODUCT", "marlin",
+        "MODEL", "Pixel XL",
+        "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
+    );
 
     private static final Field OFFSET_FIELD;
     private static final Unsafe UNSAFE;
@@ -137,9 +147,20 @@ public final class PixelPropsUtils {
     }
 
     public void setProps(String packageName) {
-        if (packageName == null || !sIsEnabled) {
+        if (packageName == null) {
             return;
         }
+
+        if (PACKAGE_PHOTOS.equals(packageName)) {
+            Logger.d("Spoofing Google Photos to Pixel XL");
+            marlinProps.forEach(PixelPropsUtils::setPropValue);
+            return;
+        }
+
+        if (!sIsEnabled) {
+            return;
+        }
+
         final String fp = (String) certifiedProps.get("FINGERPRINT");
         if (fp == null || fp.isEmpty()) {
             // no spoofing if the overlay doesn't exist
