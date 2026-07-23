@@ -369,7 +369,8 @@ public class NotificationBackgroundView extends View implements Dumpable,
                                 mBackgroundBlurDrawable.setXfermode(null);
                                 mBackgroundBlurDrawable.setCallback(
                                         NotificationBackgroundView.this);
-                                mBackgroundBlurDrawable.setColor(mNormalColor);
+                                mBackgroundBlurDrawable.setColor(
+                                        mTintColor != 0 ? mTintColor : mNormalColor);
 
                                 updateBackgroundRadii();
                                 invalidate();
