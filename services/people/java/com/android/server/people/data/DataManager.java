@@ -1197,14 +1197,23 @@ public class DataManager {
                     return;
                 }
                 if (DEBUG) Log.d(TAG, "Last event from notification: " + sbn.getPostTime());
+
+                String channelId = sbn.getNotification().getChannelId();
+                NotificationChannel rankChannel = rank.getChannel();
                 ConversationInfo.Builder updated = new ConversationInfo.Builder(conversationInfo)
-                        .setLastEventTimestamp(sbn.getPostTime())
-                        .setNotificationChannelId(rank.getChannel().getId());
-                if (!TextUtils.isEmpty(rank.getChannel().getParentChannelId())) {
-                    updated.setParentNotificationChannelId(rank.getChannel().getParentChannelId());
+                        .setLastEventTimestamp(sbn.getPostTime());
+
+                if (rankChannel != null) {
+                    String parentId = rankChannel.getParentChannelId();
+
+                    updated.setNotificationChannelId(rankChannel.getId());
+                    updated.setParentNotificationChannelId(
+                            TextUtils.isEmpty(parentId) ? channelId : parentId);
                 } else {
-                    updated.setParentNotificationChannelId(sbn.getNotification().getChannelId());
+                    updated.setNotificationChannelId(channelId);
+                    updated.setParentNotificationChannelId(channelId);
                 }
+
                 packageData.getConversationStore().addOrUpdate(updated.build());
 
                 EventHistoryImpl eventHistory = packageData.getEventStore().getOrCreateEventHistory(
