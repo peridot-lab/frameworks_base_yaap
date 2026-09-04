@@ -114,7 +114,7 @@ public final class PixelPropsUtils {
         final String cert_device = res.getString(R.string.cert_device);
         final String cert_fp = res.getString(R.string.cert_fp);
         final String cert_model = res.getString(R.string.cert_model);
-        final String cert_spl = res.getString(R.string.cert_spl);
+        final String cert_spl = Build.VERSION.SECURITY_PATCH;
         final String cert_manufacturer = res.getString(R.string.cert_manufacturer);
 
         Map<String, Object> tMap = new HashMap<>();
