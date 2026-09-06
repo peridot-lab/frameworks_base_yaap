@@ -66,8 +66,8 @@ public class DarkIconManager extends IconManager {
                 mobileUiAdapterKairos,
                 mobileContextProvider,
                 kairosNetwork,
-                appScope,
-                wifiStandardFactory);
+                wifiStandardFactory,
+                appScope);
         mIconHorizontalMargin = mContext.getResources().getDimensionPixelSize(
                 com.android.systemui.res.R.dimen.status_bar_icon_horizontal_margin);
         mDarkIconDispatcher = darkIconDispatcher;

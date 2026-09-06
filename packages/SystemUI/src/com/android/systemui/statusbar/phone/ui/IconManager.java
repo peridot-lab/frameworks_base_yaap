@@ -391,8 +391,8 @@ public class IconManager implements DemoModeCommandReceiver {
                 mIconSize,
                 mMobileUiAdapterKairos,
                 mKairosNetwork,
-                mWifiStandardFactory,
-                mAppScope
+                mAppScope,
+                mWifiStandardFactory
         );
     }
 

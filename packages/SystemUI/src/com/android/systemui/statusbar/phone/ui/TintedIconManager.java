@@ -66,8 +66,9 @@ public class TintedIconManager extends IconManager {
                 wifiUiAdapter,
                 mobileUiAdapter,
                 mobileUiAdapterKairos,
-                mobileContextProvider, kairosNetwork, appScope,
-                wifiStandardFactory);
+                mobileContextProvider, kairosNetwork,
+                wifiStandardFactory,
+                appScope);
     }
 
     @Override
