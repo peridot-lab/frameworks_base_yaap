@@ -30,12 +30,12 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.internal.graphics.drawable.BackgroundBlurDrawable;
@@ -328,10 +328,26 @@ public class NotificationBackgroundView extends View implements Dumpable,
      *
      * @param enabled - If true, queues creation of a {BackgroundBlurDrawable}. If false, removes
      *     any reference to a blurred drawable.
+     *
+     * Note: this is called from {@code ActivatableNotificationView.onFinishInflate()}, which
+     * runs on the {@code NotifInflation} background thread when inflated via
+     * {@code AsyncRowInflater}. It must therefore be safe to call off the main thread.
      */
-    @UiThread
     public void setBlurBackgroundEnabled(boolean enabled) {
         if (!lockscreenBlurForNotifications()) {
+            return;
+        }
+        if (enabled
+                && (mBackgroundBlurDrawable != null || mOnAttachStateChangeListener != null)) {
+            return;
+        }
+        if (!enabled
+                && mBackgroundBlurDrawable == null
+                && mOnAttachStateChangeListener == null) {
+            return;
+        }
+        if (!Looper.getMainLooper().isCurrentThread()) {
+            post(() -> setBlurBackgroundEnabled(enabled));
             return;
         }
         Assert.isMainThread();
