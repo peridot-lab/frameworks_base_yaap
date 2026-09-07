@@ -3227,11 +3227,6 @@ public class ActivityManagerService extends IActivityManager.Stub
                 "validateAssociationAllowedPerAppManifestLocked");
         try {
             if (sourcePkg == null || targetPkg == null) {
-                if (!UserHandle.isCore(sourceUid) && !UserHandle.isCore(targetUid)) {
-                    Slog.w(TAG, "Skipping manifest association check for null package. "
-                                    + "SourceUid: " + sourceUid + ", SourcePkg: " + sourcePkg
-                                    + ", TargetUid: " + targetUid + ", TargetPkg: " + targetPkg);
-                }
                 return true;
             }
             // Always allow self-communication.
