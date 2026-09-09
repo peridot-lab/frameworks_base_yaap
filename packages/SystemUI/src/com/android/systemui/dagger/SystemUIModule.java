@@ -138,6 +138,7 @@ import com.android.systemui.shared.condition.Monitor;
 import com.android.systemui.smartspace.config.BcSmartspaceConfigProvider;
 import com.android.systemui.smartspace.dagger.SmartspaceModule;
 import com.android.systemui.startable.Dependencies;
+import com.android.systemui.statusbar.quickactions.dynamicisland.media.MediaControlChipModule;
 import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.NotificationLockscreenUserManager;
 import com.android.systemui.statusbar.NotificationShadeWindowController;
@@ -236,6 +237,7 @@ import kotlinx.coroutines.CoroutineScope;
  */
 @Module(includes = {
         ActivityModule.class,
+        MediaControlChipModule.class,
         AmbientModule.class,
         AppOpsModule.class,
         AssistModule.class,
