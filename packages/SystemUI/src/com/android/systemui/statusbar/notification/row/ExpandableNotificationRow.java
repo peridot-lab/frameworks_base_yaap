@@ -962,6 +962,7 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
         }
         if (notificationRowTransparency()) {
             updateBackgroundTint();
+            mBackgroundNormal.setBlurBackgroundEnabled(usesBlurredBackground());
         }
     }
 
@@ -4709,11 +4710,10 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
 
     @Override
     protected boolean usesTransparentBackground() {
-        // Row background should be opaque when it's displayed as a heads-up notification or
-        // displayed on keyguard.
+        // Make our heads-up notifications transparent too!
         // Also, for an unpinned HUN on the unlocked shade, the row bg should be transparent.
         return super.usesTransparentBackground()
-                && !mustStayOnScreen()
+                && (!mustStayOnScreen() || isHeadsUp())
                 && !(isChildInGroup() && !mNotificationParent.usesTransparentBackground())
                 && !mHeadsupDisappearRunning;
     }
