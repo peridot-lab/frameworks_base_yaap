@@ -583,6 +583,16 @@ public class DisplayPolicy {
                                 Boost.INTERACTION, duration);
                     }
                 }
+                
+                @Override
+                public void onScroll(boolean started) {
+                    if (mService.mPowerManagerInternal != null) {
+                        if (started) {
+                            mService.mPowerManagerInternal.setPowerBoost(
+                                    Boost.INTERACTION, 700);
+                        }
+                    }
+                }
 
                 @Override
                 public void onDebug() {
