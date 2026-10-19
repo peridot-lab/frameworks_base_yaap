@@ -128,6 +128,7 @@ import com.android.systemui.communal.domain.interactor.CommunalInteractor;
 import com.android.systemui.dagger.SysUISingleton;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.dagger.qualifiers.UiBackground;
+import com.android.systemui.statusbar.policy.GameSpaceManager;
 import com.android.systemui.demomode.DemoMode;
 import com.android.systemui.demomode.DemoModeController;
 import com.android.systemui.emergency.EmergencyGesture;
@@ -426,6 +427,8 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
     private final WallpaperManager mWallpaperManager;
     private final UserTracker mUserTracker;
     private final ActivityStarter mActivityStarter;
+
+    private GameSpaceManager mGameSpaceManager;
 
     private final DisplayMetrics mDisplayMetrics;
 
@@ -777,6 +780,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
 
         mActivityIntentHelper = new ActivityIntentHelper(mContext);
         mActivityTransitionAnimator = activityTransitionAnimator;
+        mGameSpaceManager = new GameSpaceManager(mContext, mKeyguardStateController);
 
         // TODO(b/190746471): Find a better home for this.
         DateTimeView.setReceiverHandler(timeTickHandler);
@@ -1253,6 +1257,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
         }
         mBroadcastDispatcher.registerReceiver(
                 mBroadcastReceiver, filter, executor, UserHandle.ALL);
+        mGameSpaceManager.observe();
     }
 
     protected QS createDefaultQSFragment() {
@@ -2802,6 +2807,11 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
     @Override
     public boolean isBouncerShowingScrimmed() {
         return isBouncerShowing() && mStatusBarKeyguardViewManager.primaryBouncerNeedsScrimming();
+    }
+
+    @Override
+    public GameSpaceManager getGameSpaceManager() {
+        return mGameSpaceManager;
     }
 
     // End Extra BaseStatusBarMethods.
