@@ -7198,6 +7198,20 @@ public final class Settings {
          */
         @Readable
         public static final String RINGTONE_VIBRATION_PATTERN = "ringtone_vibration_pattern";
+        
+        /**
+         * GameSpace: List of added games by user
+         * @hide
+         */
+        @Readable
+        public static final String GAMESPACE_GAME_LIST = "gamespace_game_list";
+
+        /**
+         * GameSpace: Whether fullscreen intent will be suppressed while in game session
+         * @hide
+         */
+        @Readable
+        public static final String GAMESPACE_SUPPRESS_FULLSCREEN_INTENT = "gamespace_suppress_fullscreen_intent";
 
         /**
          * Custom vibration pattern
@@ -14576,7 +14590,7 @@ public final class Settings {
          */
         @Readable
         public static final String VBOOT_HASH = "vboot_hash";
-
+        
         /**
          * Our GameSpace can't write to device_config directly [GTS]
          * Use this as intermediate to pass device_config property
