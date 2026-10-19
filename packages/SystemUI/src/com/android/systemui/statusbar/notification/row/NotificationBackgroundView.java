@@ -33,6 +33,8 @@ import android.graphics.drawable.RippleDrawable;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewParent;
+import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -87,6 +89,10 @@ public class NotificationBackgroundView extends View implements Dumpable,
     // True only if the dismiss button is visible.
     private boolean mDrawDismissButtonCutout = false;
     private boolean mOnKeyguard = true;
+    private boolean mAggregatedVisible = true;
+    private boolean mBlurVisible = true;
+    private final Rect mTmpGlobalRect = new Rect();
+    private ViewTreeObserver.OnPreDrawListener mBlurPreDrawListener;
 
     public NotificationBackgroundView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -118,6 +124,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
 
     @Override
     protected void onDraw(Canvas canvas) {
+        updateBlurVisibility();
         float clipTop = Math.max(mClipTopAmount, mTopOverlap);
         int clipBottomAmount = Math.max(mClipBottomAmount, mBottomOverlap);
         if (clipTop + clipBottomAmount < getActualHeight() || mExpandAnimationRunning) {
@@ -128,7 +135,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
             }
 
             if (!NotificationAddXOnHoverToDismiss.isEnabled()) {
-                if (mBackgroundBlurDrawable != null) {
+                if (mBackgroundBlurDrawable != null && mBlurVisible) {
                     draw(canvas, mBackgroundBlurDrawable);
                 } else {
                     draw(canvas, mBackground);
@@ -146,7 +153,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
             if (mDrawDismissButtonCutout) {
                 canvas.clipPath(calculateDismissButtonCutoutPath(backgroundBounds));
             }
-            if (mBackgroundBlurDrawable != null) {
+            if (mBackgroundBlurDrawable != null && mBlurVisible) {
                 mBackgroundBlurDrawable.setBounds(backgroundBounds);
                 mBackgroundBlurDrawable.draw(canvas);
             } else if (mBackground != null) {
@@ -251,7 +258,8 @@ public class NotificationBackgroundView extends View implements Dumpable,
 
     @Override
     protected boolean verifyDrawable(Drawable who) {
-        return super.verifyDrawable(who) || who == mBackground;
+        return super.verifyDrawable(who) || who == mBackground
+                || who == mBackgroundBlurDrawable;
     }
 
     @Override
@@ -277,6 +285,113 @@ public class NotificationBackgroundView extends View implements Dumpable,
         // TODO: (b/445495701) - Determine why this value is opposite of expected, then use in #draw
         // to restrict the blurred background to the keyguard only.
         mOnKeyguard = onKeyguard;
+        updateBlurVisibility();
+    }
+
+    @Override
+    public void setAlpha(float alpha) {
+        super.setAlpha(alpha);
+        updateBlurVisibility();
+    }
+
+    @Override
+    public void onVisibilityAggregated(boolean isVisible) {
+        super.onVisibilityAggregated(isVisible);
+        mAggregatedVisible = isVisible;
+        updateBlurVisibility();
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        updateBlurVisibility();
+    }
+
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        updateBlurVisibility();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (mBlurPreDrawListener == null) {
+            mBlurPreDrawListener = () -> {
+                updateBlurVisibility();
+                return true;
+            };
+            getViewTreeObserver().addOnPreDrawListener(mBlurPreDrawListener);
+        }
+        updateBlurVisibility();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (mBlurPreDrawListener != null) {
+            ViewTreeObserver vto = getViewTreeObserver();
+            if (vto.isAlive()) {
+                vto.removeOnPreDrawListener(mBlurPreDrawListener);
+            }
+            mBlurPreDrawListener = null;
+        }
+        if (mBackgroundBlurDrawable != null) {
+            mBackgroundBlurDrawable.setVisible(false, false);
+        }
+        mBlurVisible = false;
+    }
+
+    private boolean isFullyClipped() {
+        float clipTop = Math.max(mClipTopAmount, mTopOverlap);
+        int clipBottom = Math.max(mClipBottomAmount, mBottomOverlap);
+        int height = getActualHeight();
+        if (height <= 0) {
+            height = getHeight();
+        }
+        return height > 0 && clipTop + clipBottom >= height;
+    }
+
+    private float getEffectiveAlpha() {
+        float alpha = getAlpha();
+        if (alpha <= 0f) {
+            return 0f;
+        }
+        ViewParent parent = getParent();
+        while (parent instanceof View) {
+            alpha *= ((View) parent).getAlpha();
+            if (alpha <= 0f) {
+                return 0f;
+            }
+            parent = parent.getParent();
+        }
+        return alpha;
+    }
+
+    private void updateBlurVisibility() {
+        if (mBackgroundBlurDrawable == null) {
+            return;
+        }
+        boolean visible = mAggregatedVisible
+                && mDrawableAlpha > 0
+                && getAlpha() > 0f
+                && getEffectiveAlpha() > 0f
+                && isAttachedToWindow()
+                && getWindowVisibility() == VISIBLE
+                && isShown()
+                && getWidth() > 0
+                && getHeight() > 0
+                && !isFullyClipped();
+        if (visible) {
+            visible = getGlobalVisibleRect(mTmpGlobalRect) && !mTmpGlobalRect.isEmpty();
+        }
+        if (visible != mBlurVisible) {
+            mBlurVisible = visible;
+            mBackgroundBlurDrawable.setVisible(visible, false);
+            invalidate();
+        } else if (!visible && mBackgroundBlurDrawable.isVisible()) {
+            mBackgroundBlurDrawable.setVisible(false, false);
+        }
     }
 
     /**
@@ -373,6 +488,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
                                         mTintColor != 0 ? mTintColor : mNormalColor);
 
                                 updateBackgroundRadii();
+                                updateBlurVisibility();
                                 invalidate();
                             }
                             NotificationBackgroundView.this.removeOnAttachStateChangeListener(this);
@@ -393,6 +509,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
                 mOnAttachStateChangeListener = null;
             }
             if (mBackgroundBlurDrawable != null) {
+                mBackgroundBlurDrawable.setVisible(false, false);
                 mBackgroundBlurDrawable.setCallback(null);
             }
             mBackgroundBlurDrawable = null;
@@ -428,6 +545,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
             return;
         }
         mActualHeight = actualHeight;
+        updateBlurVisibility();
         invalidate();
     }
 
@@ -455,6 +573,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
 
     public void setClipTopAmount(int clipTopAmount) {
         mClipTopAmount = clipTopAmount;
+        updateBlurVisibility();
         invalidate();
     }
 
@@ -466,6 +585,7 @@ public class NotificationBackgroundView extends View implements Dumpable,
      */
     public void setTopOverlap(int topOverlap) {
         mTopOverlap = topOverlap;
+        updateBlurVisibility();
         invalidate();
     }
 
@@ -477,11 +597,13 @@ public class NotificationBackgroundView extends View implements Dumpable,
      */
     public void setBottomOverlap(int bottomOverlap) {
         mBottomOverlap = bottomOverlap;
+        updateBlurVisibility();
         invalidate();
     }
 
     public void setClipBottomAmount(int clipBottomAmount) {
         mClipBottomAmount = clipBottomAmount;
+        updateBlurVisibility();
         invalidate();
     }
 
@@ -511,11 +633,13 @@ public class NotificationBackgroundView extends View implements Dumpable,
     public void setDrawableAlpha(int drawableAlpha) {
         mDrawableAlpha = drawableAlpha;
         if (mExpandAnimationRunning) {
+            updateBlurVisibility();
             return;
         }
         mBackground.setAlpha(drawableAlpha);
         if (mBackgroundBlurDrawable != null) {
             mBackgroundBlurDrawable.setAlpha(drawableAlpha);
+            updateBlurVisibility();
         }
     }
 
