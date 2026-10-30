@@ -26,8 +26,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ListAdapter;
 
-import com.android.systemui.shared.system.BlurUtils;
-
 /**
  * Creates a customized Dialog for displaying the Shut Down and Restart actions.
  */
@@ -47,8 +45,7 @@ public class GlobalActionsPowerDialog {
 
         Resources res = context.getResources();
 
-        Dialog dialog = new Dialog(context,
-                com.android.systemui.res.R.style.Theme_SystemUI_Dialog_GlobalActionsLite);
+        Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(listView);
 
@@ -58,7 +55,6 @@ public class GlobalActionsPowerDialog {
         window.setBackgroundDrawable(res.getDrawable(
                 com.android.systemui.res.R.drawable.control_background, context.getTheme()));
         window.addFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        window.setDimAmount(BlurUtils.supportsBlursOnWindows() ? 0.54f : 0.88f);
 
         return dialog;
     }
