@@ -372,7 +372,7 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
     }
 
     protected boolean usesBlurredBackground() {
-        return usesTransparentBackground() && lockscreenBlurForNotifications();
+        return mOnKeyguard && usesTransparentBackground() && lockscreenBlurForNotifications();
     }
 
     protected boolean usesTransparentBackground() {
@@ -885,6 +885,7 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
         mBackgroundNormal.setOnKeyguard(mOnKeyguard);
         if (notificationRowTransparency()) {
             updateBackgroundTint();
+            mBackgroundNormal.setBlurBackgroundEnabled(usesBlurredBackground());
         }
     }
 
