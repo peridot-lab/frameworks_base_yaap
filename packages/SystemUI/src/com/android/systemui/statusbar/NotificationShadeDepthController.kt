@@ -310,7 +310,7 @@ constructor(
             )
         var combinedBlur =
             (expansionRadius.toFloat() * INTERACTION_BLUR_FRACTION +
-                animationRadius * ANIMATION_BLUR_FRACTION)
+                animationRadius * ANIMATION_BLUR_FRACTION * shadeExpansion)
         val qsExpandedRatio =
             ShadeInterpolation.getNotificationScrimAlpha(qsPanelExpansion) * shadeExpansion
         combinedBlur =
