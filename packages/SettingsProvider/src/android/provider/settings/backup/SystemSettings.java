@@ -200,6 +200,8 @@ public class SystemSettings {
                 Settings.System.MAX_CALL_VOLUME,
                 Settings.System.MAX_MUSIC_VOLUME,
                 Settings.System.MAX_ALARM_VOLUME,
+                Settings.System.MAX_RING_VOLUME,
+                Settings.System.MAX_NOTIFICATION_VOLUME,
                 Settings.System.LOCKSCREEN_WEATHER_PROVIDER,
                 Settings.System.LOCKSCREEN_WEATHER_LOCATION,
                 Settings.System.LOCKSCREEN_WEATHER_TEXT,
